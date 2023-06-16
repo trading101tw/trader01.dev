@@ -1,0 +1,73 @@
+<template>
+  <div>
+    <table>
+      <thead>
+        <tr>
+          <th v-for="header in tableHeaders" :key="header" @click="sortByColumn(header)">
+            {{ header }} <span v-if="sortColumn === header">{{ sortDirection }}</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(rowData, index) in sortedTableData" :key="index">
+          <td v-for="(value, key) in rowData" :key="key">{{ value }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      tableData: [],
+      sortColumn: '',
+      sortDirection: '',
+    };
+  },
+  computed: {
+    tableHeaders() {
+      return Object.keys(this.tableData[0] || {});
+    },
+    sortedTableData() {
+      if (this.sortColumn) {
+        return this.tableData.slice().sort((a, b) => {
+          const aValue = a[this.sortColumn];
+          const bValue = b[this.sortColumn];
+          return aValue.localeCompare(bValue);
+        });
+      }
+      return this.tableData;
+    },
+  },
+  mounted() {
+    this.getData();
+  },
+  methods: {
+    async getData() {
+      try {
+        const response = await axios.get('http://0.0.0.0:8882/data');
+        this.tableData = response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    sortByColumn(column) {
+      if (this.sortColumn === column) {
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sortColumn = column;
+        this.sortDirection = 'asc';
+      }
+    },
+  },
+};
+</script>
+
+<style scoped>
+/* CSS 樣式 */
+</style>
+

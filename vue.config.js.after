@@ -1,0 +1,16 @@
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
+module.exports = {
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://0.0.0.0:8882',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': '/data',
+        },
+      },
+    },
+  },
+};
+
